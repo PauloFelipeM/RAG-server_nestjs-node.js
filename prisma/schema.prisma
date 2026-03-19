@@ -1,0 +1,58 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
+}
+
+model Client {
+  id        String                       @id @default(uuid())
+  name      String
+  shortBio  String                       @map("short_bio")
+  email     String                       @unique
+  age       Int
+  gender    String
+  job       String
+  embedding Unsupported("vector(1536)")?
+  address   Address?
+  companies ClientCompany[]
+  createdAt DateTime                     @default(now()) @map("created_at")
+  updatedAt DateTime                     @updatedAt @map("updated_at")
+
+  @@map("clients")
+}
+
+model Address {
+  id       String @id @default(uuid())
+  street   String
+  city     String
+  state    String
+  zipCode  String @map("zip_code")
+  country  String
+  clientId String @unique @map("client_id")
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("addresses")
+}
+
+model Company {
+  id      String          @id @default(uuid())
+  name    String          @unique
+  clients ClientCompany[]
+
+  @@map("companies")
+}
+
+model ClientCompany {
+  clientId  String  @map("client_id")
+  companyId String  @map("company_id")
+  client    Client  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@id([clientId, companyId])
+  @@map("client_companies")
+}
