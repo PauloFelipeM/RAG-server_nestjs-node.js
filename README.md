@@ -1,4 +1,4 @@
-# RAG with NestJS
+# RAG with Node.JS and NestJS
 
 A Retrieval-Augmented Generation (RAG) system for client information, built with NestJS, Prisma, pgvector, and OpenAI.
 
